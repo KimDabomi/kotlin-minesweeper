@@ -31,25 +31,8 @@ sealed class Cell {
             column: Int,
             allCells: Cells,
         ): Cell {
-            val adjacentMineCount = countAdjacentMines(row, column, allCells)
+            val adjacentMineCount = Directions.countMatching(row, column, allCells) { it.isMine() }
             return if (adjacentMineCount > 0) NumberCell(adjacentMineCount) else this
-        }
-
-        private fun countAdjacentMines(
-            row: Int,
-            column: Int,
-            allCells: Cells,
-        ): Int {
-            return DIRECTIONS.count { (directionRow, directionColumn) ->
-                val newRow = row + directionRow
-                val newColumn = column + directionColumn
-
-                if (newRow in 0 until allCells.size && newColumn in 0 until allCells[newRow].size) {
-                    allCells[newRow][newColumn].isMine()
-                } else {
-                    false
-                }
-            }
         }
 
         override fun open(
@@ -59,21 +42,10 @@ sealed class Cell {
         ): List<Position> {
             if (isOpen) return emptyList()
             super.open(row, column, allCells)
-            return DIRECTIONS.flatMap { (directionRow, directionColumn) ->
-                val newRow = row + directionRow
-                val newColumn = column + directionColumn
-
-                if (newRow in 0 until allCells.size && newColumn in 0 until allCells[newRow].size) {
-                    val adjacentCell = allCells[newRow][newColumn]
-                    if (!adjacentCell.isOpen && adjacentCell is Empty) {
-                        listOf(Position(newRow, newColumn)) + adjacentCell.open(newRow, newColumn, allCells)
-                    } else {
-                        emptyList()
-                    }
-                } else {
-                    emptyList()
+            return Directions.findMatchingPositions(row, column, allCells) { !it.isOpen && it is Empty }
+                .flatMap { position ->
+                    listOf(position) + allCells[position.row][position.column].open(position.row, position.column, allCells)
                 }
-            }
         }
     }
 
