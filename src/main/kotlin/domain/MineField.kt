@@ -30,9 +30,8 @@ class MineField(
         return if (cell.isMine()) {
             false
         } else {
-            val positionsToOpen = cell.open(row, col, grid.getCells())
-            positionsToOpen.forEach { (r, c) ->
-                grid.getCells()[r][c].isOpen = true
+            cell.open(row, col, grid.getCells()).forEach { (r, c) ->
+                grid.getCells()[r][c].open(r, c, grid.getCells())
             }
             true
         }

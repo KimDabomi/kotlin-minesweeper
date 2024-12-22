@@ -2,7 +2,9 @@ package domain
 
 sealed class Cell {
     abstract val id: CellId
-    abstract var isOpen: Boolean
+    private var _isOpen: Boolean = false
+    val isOpen: Boolean
+        get() = _isOpen
 
     abstract fun addNumberHint(
         row: Int,
@@ -16,11 +18,13 @@ sealed class Cell {
         row: Int,
         col: Int,
         allCells: Cells,
-    ): List<Position> = emptyList()
+    ): List<Position> {
+        _isOpen = true
+        return emptyList()
+    }
 
     data object Empty : Cell() {
         override val id = CellId.EMPTY
-        override var isOpen: Boolean = false
 
         override fun addNumberHint(
             row: Int,
@@ -54,7 +58,7 @@ sealed class Cell {
             allCells: Cells,
         ): List<Position> {
             if (isOpen) return emptyList()
-            isOpen = true
+            super.open(row, col, allCells)
             return DIRECTIONS.flatMap { (dr, dc) ->
                 val newRow = row + dr
                 val newCol = col + dc
@@ -75,7 +79,6 @@ sealed class Cell {
 
     data object MineCell : Cell() {
         override val id = CellId.MINE
-        override var isOpen: Boolean = false
 
         override fun isMine(): Boolean = true
 
@@ -83,29 +86,24 @@ sealed class Cell {
             row: Int,
             col: Int,
             allCells: Cells,
-        ): Cell {
-            return this
-        }
+        ): Cell = this
     }
 
     data class NumberCell(val count: Int) : Cell() {
         override val id = CellId.NUMBER
-        override var isOpen: Boolean = false
 
         override fun addNumberHint(
             row: Int,
             col: Int,
             allCells: Cells,
-        ): Cell {
-            return this
-        }
+        ): Cell = this
 
         override fun open(
             row: Int,
             col: Int,
             allCells: Cells,
         ): List<Position> {
-            isOpen = true
+            super.open(row, col, allCells)
             return emptyList()
         }
     }
