@@ -25,7 +25,7 @@ class Game(
 
     fun isWin(): Boolean {
         val state = mineField.getState()
-        return state.cells.getRows().all { row ->
+        return state.cells.rows.all { row ->
             row.getCells().all { cell ->
                 cell.isOpen || cell.isMine()
             }

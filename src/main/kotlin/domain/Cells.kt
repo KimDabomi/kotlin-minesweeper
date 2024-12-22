@@ -1,20 +1,21 @@
 package domain
 
-class Cells(private val rows: List<Row>) {
-    fun getRows(): List<Row> = rows.toList()
+class Cells(private val initialRows: List<Row>) {
+    val rows: List<Row> get() = _rows
+    private val _rows: MutableList<Row> = initialRows.toMutableList()
 
     fun addNumberHints(): Cells {
         val updatedRows =
-            rows.mapIndexed { rowIndex, row ->
+            _rows.mapIndexed { rowIndex, row ->
                 row.addNumberHints(rowIndex, this)
             }
         return Cells(updatedRows)
     }
 
-    operator fun get(row: Int): Row = rows[row]
+    operator fun get(row: Int): Row = _rows[row]
 
     val size: Int
-        get() = rows.size
+        get() = _rows.size
 
     companion object {
         fun create(
