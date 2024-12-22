@@ -12,6 +12,10 @@ class Cells(private val initialRows: List<Row>) {
         return Cells(updatedRows)
     }
 
+    fun areAllNonMinesOpened(): Boolean {
+        return rows.all { it.areAllNonMinesOpened() }
+    }
+
     operator fun get(row: Int): Row = _rows[row]
 
     val size: Int
