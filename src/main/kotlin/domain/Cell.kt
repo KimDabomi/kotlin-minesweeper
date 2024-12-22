@@ -8,7 +8,7 @@ sealed class Cell {
 
     abstract fun addNumberHint(
         row: Int,
-        col: Int,
+        column: Int,
         allCells: Cells,
     ): Cell
 
@@ -16,7 +16,7 @@ sealed class Cell {
 
     open fun open(
         row: Int,
-        col: Int,
+        column: Int,
         allCells: Cells,
     ): List<Position> {
         _isOpen = true
@@ -28,24 +28,24 @@ sealed class Cell {
 
         override fun addNumberHint(
             row: Int,
-            col: Int,
+            column: Int,
             allCells: Cells,
         ): Cell {
-            val adjacentMineCount = countAdjacentMines(row, col, allCells)
+            val adjacentMineCount = countAdjacentMines(row, column, allCells)
             return if (adjacentMineCount > 0) NumberCell(adjacentMineCount) else this
         }
 
         private fun countAdjacentMines(
             row: Int,
-            col: Int,
+            column: Int,
             allCells: Cells,
         ): Int {
-            return DIRECTIONS.count { (dr, dc) ->
-                val newRow = row + dr
-                val newCol = col + dc
+            return DIRECTIONS.count { (directionRow, directionColumn) ->
+                val newRow = row + directionRow
+                val newColumn = column + directionColumn
 
-                if (newRow in 0 until allCells.size && newCol in 0 until allCells[newRow].size) {
-                    allCells[newRow][newCol].isMine()
+                if (newRow in 0 until allCells.size && newColumn in 0 until allCells[newRow].size) {
+                    allCells[newRow][newColumn].isMine()
                 } else {
                     false
                 }
@@ -54,19 +54,19 @@ sealed class Cell {
 
         override fun open(
             row: Int,
-            col: Int,
+            column: Int,
             allCells: Cells,
         ): List<Position> {
             if (isOpen) return emptyList()
-            super.open(row, col, allCells)
-            return DIRECTIONS.flatMap { (dr, dc) ->
-                val newRow = row + dr
-                val newCol = col + dc
+            super.open(row, column, allCells)
+            return DIRECTIONS.flatMap { (directionRow, directionColumn) ->
+                val newRow = row + directionRow
+                val newColumn = column + directionColumn
 
-                if (newRow in 0 until allCells.size && newCol in 0 until allCells[newRow].size) {
-                    val adjacentCell = allCells[newRow][newCol]
+                if (newRow in 0 until allCells.size && newColumn in 0 until allCells[newRow].size) {
+                    val adjacentCell = allCells[newRow][newColumn]
                     if (!adjacentCell.isOpen && adjacentCell is Empty) {
-                        listOf(Position(newRow, newCol)) + adjacentCell.open(newRow, newCol, allCells)
+                        listOf(Position(newRow, newColumn)) + adjacentCell.open(newRow, newColumn, allCells)
                     } else {
                         emptyList()
                     }
@@ -84,7 +84,7 @@ sealed class Cell {
 
         override fun addNumberHint(
             row: Int,
-            col: Int,
+            column: Int,
             allCells: Cells,
         ): Cell = this
     }
@@ -94,16 +94,16 @@ sealed class Cell {
 
         override fun addNumberHint(
             row: Int,
-            col: Int,
+            column: Int,
             allCells: Cells,
         ): Cell = this
 
         override fun open(
             row: Int,
-            col: Int,
+            column: Int,
             allCells: Cells,
         ): List<Position> {
-            super.open(row, col, allCells)
+            super.open(row, column, allCells)
             return emptyList()
         }
     }

@@ -18,9 +18,9 @@ class Game(
 
     fun openCell(
         row: Int,
-        col: Int,
+        column: Int,
     ): Boolean {
-        return mineField.openCell(row, col)
+        return mineField.openCell(row, column)
     }
 
     fun isWin(): Boolean {

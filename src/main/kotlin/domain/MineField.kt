@@ -4,7 +4,6 @@ class MineField(
     private val height: Height,
     private val width: Width,
     private val mineCount: Int,
-    private val cellMapper: CellMapper = DefaultCellMapper(),
 ) {
     private val grid: Grid
 
@@ -24,13 +23,13 @@ class MineField(
 
     fun openCell(
         row: Int,
-        col: Int,
+        column: Int,
     ): Boolean {
-        val cell = grid.getCells()[row][col]
+        val cell = grid.getCells()[row][column]
         return if (cell.isMine()) {
             false
         } else {
-            cell.open(row, col, grid.getCells()).forEach { (r, c) ->
+            cell.open(row, column, grid.getCells()).forEach { (r, c) ->
                 grid.getCells()[r][c].open(r, c, grid.getCells())
             }
             true
