@@ -1,7 +1,7 @@
 package domain
 
 class Cells(private val initialRows: List<Row>) {
-    private val _rows: MutableList<Row> = initialRows.toMutableList()
+    val _rows: MutableList<Row> = initialRows.toMutableList()
     val rows: List<Row> get() = _rows
 
     fun addNumberHints(): Cells {
