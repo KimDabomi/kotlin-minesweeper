@@ -42,10 +42,17 @@ sealed class Cell {
         ): List<Position> {
             if (isOpen) return emptyList()
             super.open(row, column, allCells)
-            return Directions.findMatchingPositions(row, column, allCells) { !it.isOpen && it is Empty }
-                .flatMap { position ->
-                    listOf(position) + allCells[position.row][position.column].open(position.row, position.column, allCells)
-                }
+
+            val positionsToOpen = Directions.findMatchingPositions(row, column, allCells) {
+                it is Empty && !it.isOpen
+            }
+            val allOpenedPositions = mutableListOf(Position(row, column))
+
+            positionsToOpen.forEach { position ->
+                allOpenedPositions += allCells[position.row][position.column].open(position.row, position.column, allCells)
+            }
+
+            return allOpenedPositions
         }
     }
 
@@ -59,6 +66,15 @@ sealed class Cell {
             column: Int,
             allCells: Cells,
         ): Cell = this
+
+        override fun open(
+            row: Int,
+            column: Int,
+            allCells: Cells,
+        ): List<Position> {
+            super.open(row, column, allCells)
+            return listOf(Position(row, column))
+        }
     }
 
     data class NumberCell(val count: Int) : Cell() {
