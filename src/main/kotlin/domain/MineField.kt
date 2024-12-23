@@ -5,13 +5,12 @@ class MineField(
     private val width: Width,
     private val mineCount: Int,
 ) {
-    private val grid: Grid
+    private val grid: Cells
 
     init {
         require(mineCount <= height.value * width.value) { MINE_MAXIMUM_EXCEPTION_MESSAGE }
         val minePositions = generateAllPositions().shuffled().take(mineCount).toSet()
-        val cells = Cells.create(height.value, width.value, minePositions)
-        grid = Grid(height, width, cells).withNumberHints()
+        grid = Cells.create(height.value, width.value, minePositions).addNumberHints()
     }
 
     private fun generateAllPositions(): List<Position> =
@@ -19,25 +18,19 @@ class MineField(
             Position(index / width.value, index % width.value)
         }
 
-    fun getState(): MineFieldState = MineFieldState(grid.getCells())
+    fun getState(): MineFieldState = MineFieldState(grid)
 
     fun openCell(
         row: Int,
         column: Int,
     ): Boolean {
-        val cell = grid.getCells()[row][column]
-        return if (cell.isMine()) {
-            cell.open(row, column, grid.getCells())
-            false
-        } else {
-            val positionsToOpen = cell.open(row, column, grid.getCells())
-            positionsToOpen.forEach { (row, column) ->
-                grid.getCells()[row][column].open(row, column, grid.getCells())
-            }
-            true
+        if (grid.isCellMine(row, column)) {
+            grid.openCell(row, column) // 열린 지뢰 표시
+            return false
         }
+        grid.openCell(row, column)
+        return true
     }
-
 
     companion object {
         private const val MINE_MAXIMUM_EXCEPTION_MESSAGE = "지뢰는 총 셀 수를 초과할 수 없습니다."

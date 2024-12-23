@@ -21,7 +21,7 @@ sealed class Cell {
     ): List<Position> {
         if (_isOpen) return emptyList()
         _isOpen = true
-        return emptyList()
+        return listOf(Position(row, column))
     }
 
     data object Empty : Cell() {
@@ -35,35 +35,6 @@ sealed class Cell {
             val adjacentMineCount = Directions.countMatching(row, column, allCells) { it.isMine() }
             return if (adjacentMineCount > 0) NumberCell(adjacentMineCount) else this
         }
-
-        override fun open(
-            row: Int,
-            column: Int,
-            allCells: Cells,
-        ): List<Position> {
-            if (isOpen) return emptyList()
-
-            super.open(row, column, allCells)
-            val visited = mutableSetOf<Position>()
-            val positionsToOpen = mutableListOf<Position>()
-
-            fun openAdjacentCells(currentRow: Int, currentColumn: Int) {
-                val currentPosition = Position(currentRow, currentColumn)
-                if (currentPosition in visited) return
-                visited += currentPosition
-                positionsToOpen += currentPosition
-
-                Directions.findMatchingPositions(currentRow, currentColumn, allCells) { cell ->
-                    !cell.isOpen && cell is Empty
-                }.forEach { (adjRow, adjCol) ->
-                    allCells[adjRow][adjCol].open(adjRow, adjCol, allCells)
-                    openAdjacentCells(adjRow, adjCol)
-                }
-            }
-
-            openAdjacentCells(row, column)
-            return positionsToOpen
-        }
     }
 
     data object MineCell : Cell() {
@@ -76,15 +47,6 @@ sealed class Cell {
             column: Int,
             allCells: Cells,
         ): Cell = this
-
-        override fun open(
-            row: Int,
-            column: Int,
-            allCells: Cells,
-        ): List<Position> {
-            super.open(row, column, allCells)
-            return listOf(Position(row, column))
-        }
     }
 
     data class NumberCell(val count: Int) : Cell() {
@@ -95,29 +57,9 @@ sealed class Cell {
             column: Int,
             allCells: Cells,
         ): Cell = this
-
-        override fun open(
-            row: Int,
-            column: Int,
-            allCells: Cells,
-        ): List<Position> {
-            return super.open(row, column, allCells)
-        }
     }
 
     companion object {
-        private val DIRECTIONS =
-            listOf(
-                -1 to -1,
-                -1 to 0,
-                -1 to 1,
-                0 to -1,
-                0 to 1,
-                1 to -1,
-                1 to 0,
-                1 to 1,
-            )
-
         fun create(isMine: Boolean): Cell = if (isMine) MineCell else Empty
     }
 }
