@@ -19,6 +19,7 @@ sealed class Cell {
         column: Int,
         allCells: Cells,
     ): List<Position> {
+        if (_isOpen) return emptyList()
         _isOpen = true
         return emptyList()
     }
@@ -41,18 +42,27 @@ sealed class Cell {
             allCells: Cells,
         ): List<Position> {
             if (isOpen) return emptyList()
+
             super.open(row, column, allCells)
+            val visited = mutableSetOf<Position>()
+            val positionsToOpen = mutableListOf<Position>()
 
-            val positionsToOpen = Directions.findMatchingPositions(row, column, allCells) {
-                it is Empty && !it.isOpen
+            fun openAdjacentCells(currentRow: Int, currentColumn: Int) {
+                val currentPosition = Position(currentRow, currentColumn)
+                if (currentPosition in visited) return
+                visited += currentPosition
+                positionsToOpen += currentPosition
+
+                Directions.findMatchingPositions(currentRow, currentColumn, allCells) { cell ->
+                    !cell.isOpen && cell is Empty
+                }.forEach { (adjRow, adjCol) ->
+                    allCells[adjRow][adjCol].open(adjRow, adjCol, allCells)
+                    openAdjacentCells(adjRow, adjCol)
+                }
             }
-            val allOpenedPositions = mutableListOf(Position(row, column))
 
-            positionsToOpen.forEach { position ->
-                allOpenedPositions += allCells[position.row][position.column].open(position.row, position.column, allCells)
-            }
-
-            return allOpenedPositions
+            openAdjacentCells(row, column)
+            return positionsToOpen
         }
     }
 
@@ -91,8 +101,7 @@ sealed class Cell {
             column: Int,
             allCells: Cells,
         ): List<Position> {
-            super.open(row, column, allCells)
-            return emptyList()
+            return super.open(row, column, allCells)
         }
     }
 
