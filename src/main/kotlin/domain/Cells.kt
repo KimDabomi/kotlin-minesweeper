@@ -16,15 +16,22 @@ class Cells(private val initialRows: List<Row>) {
         return rows.all { it.areAllNonMinesOpened() }
     }
 
-    fun openCell(row: Int, column: Int): List<Position> {
+    fun openCell(
+        row: Int,
+        column: Int,
+    ): List<Position> {
         val positionsToOpen = mutableListOf<Position>()
 
-        fun openAt(currentRow: Int, currentColumn: Int) {
+        fun openAt(
+            currentRow: Int,
+            currentColumn: Int,
+        ) {
             val cell = _rows[currentRow][currentColumn]
             if (cell.isOpen) return
 
             val openedPositions = cell.open(currentRow, currentColumn, this)
             positionsToOpen.addAll(openedPositions)
+
             if (cell is Cell.Empty) {
                 openedPositions.forEach { position ->
                     val (adjRow, adjCol) = position
@@ -37,7 +44,10 @@ class Cells(private val initialRows: List<Row>) {
         return positionsToOpen
     }
 
-    fun isCellMine(row: Int, column: Int): Boolean {
+    fun isCellMine(
+        row: Int,
+        column: Int,
+    ): Boolean {
         return _rows[row][column].isMine()
     }
 

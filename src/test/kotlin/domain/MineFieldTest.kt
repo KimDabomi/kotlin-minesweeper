@@ -49,7 +49,11 @@ class MineFieldTest : StringSpec({
     }
 })
 
-fun Cells.isCellNumber(row: Int, column: Int, expectedCount: Int): Boolean {
+fun Cells.isCellNumber(
+    row: Int,
+    column: Int,
+    expectedCount: Int,
+): Boolean {
     val cell = _rows[row][column]
     return cell is Cell.NumberCell && cell.count == expectedCount
 }
